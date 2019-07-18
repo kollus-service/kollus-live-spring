@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="common/default">
+
+<th:block layout:fragment="html_head">
+    <title>Kollus Live Sample</title>
+</th:block>
+<th:block layout:fragment="content_body">
+    <h3>콜러스 라이브 플랫폼 샘플페이지</h3>
+    <div class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
+        <iframe id="page_player" class="embed-responsive-item" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe8ie2OxtU7UoU9KSoVhGsAC3peku6rmZyWDF3t60oyl2QIoNTEw" allowfullscreen></iframe>
+    </div>
+
+    <div id="ch_list" class="card-group">
+
+
+    </div>
+
+</th:block>
+<th:block layout:fragment="page_js">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.get('/api/channel', function (data) {
+                var res = JSON.parse(data);
+                var ch_list = $('#ch_list');
+                $(res).each(function (index, item) {
+                    var c_onair =item.is_onair ? 'red' : 'black';
+                    var t_onair = item.is_onair ? 'On Air': 'Closed';
+                    var t_player = item.player ? '보안플레이어': '비보안 플레이어';
+
+                    var card = '<div class="card">' +
+                        '            <img src="' + item.snapshot + '" class="card-img-top" width="50px" height="50px" alt="' + item.ch_title + '">' +
+                        '            <div class="card-body">' +
+                        '                <h5 class="card-title">' + item.ch_title + '</h5>' +
+                        '<div class="btn-group">' +
+                        '<button type="button" class="btn btn-primary page-play" data-lmckey="' + item.ch_key + '">페이지 재생</button>' +
+                        '<button type="button" class="btn btn-warning popup-play" data-lmckey="' + item.ch_key + "\">팝업 재생</button></div>" +
+                        '<p class="card-text"><small class="text-muted ' + c_onair + '">' + t_onair + '</small></p>' +
+                    '<p class="card-text"><small class="text-muted">' + t_player + '</small></p>' +
+                        '            </div>' +
+                        '        </div>';
+                    ch_list.append($(card));
+                });
+            })
+
+            $('#ch_list').on('click', 'button', function (e) {
+
+                var lmckey = $(this).data('lmckey');
+                var type = $(this).attr('class').indexOf('page-play') > 0 ? 'page' : 'popup';
+                $.get('/api/jwt?lmckey='+lmckey, function(data){
+                    var res = JSON.parse(data);
+                    if (type == 'page'){
+                        $('#page_player').attr('src', res.url);
+                    }
+                    else if (type == 'popup'){
+                        var popOption = "width=1024, height=720, resizable=no, scrollbars=no, status=no;";
+                        window.open(res.url,"",popOption);
+
+                    }
+                });
+
+            })
+        });
+    </script>
+</th:block>
+</html>

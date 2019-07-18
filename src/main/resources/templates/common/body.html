@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body th:fragment="mainBody">
+<div class="container">
+    <th:block layout:fragment="content_body"></th:block>
+    <th:block th:include="common/footer"></th:block>
+</div>
+<!-- common js -->
+<script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/popper.js/1.14.3//umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/4.3.1/js/bootstrap.min.js}"></script>
+<!-- page css-->
+<th:block layout:fragment="page_js"></th:block>
+</body>
+</html>
+
