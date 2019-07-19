@@ -1,6 +1,7 @@
 package net.catenoid.se.kolluslive.api;
 
 import net.catenoid.se.kolluslive.config.KollusConfig;
+import net.catenoid.se.kolluslive.util.RestTemplateRequestFactory;
 import net.catenoid.se.kolluslive.util.RestTemplateResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +33,9 @@ public abstract class ApiExecutor {
 
         this.restTemplate = new RestTemplateBuilder().rootUri(this.ROOT_URL).errorHandler(
                 new RestTemplateResponseErrorHandler()
-        ).setConnectTimeout(Duration.ofSeconds(30)).build();
+        ).
+                setConnectTimeout(Duration.ofSeconds(30)).build();
+        this.restTemplate.setRequestFactory(new RestTemplateRequestFactory());
     }
 
     protected Map<String, Object> requestGet(String url, MultiValueMap<String, String> query) throws Exception {
