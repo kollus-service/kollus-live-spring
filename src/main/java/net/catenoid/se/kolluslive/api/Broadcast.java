@@ -22,7 +22,9 @@ public class Broadcast extends ApiExecutor{
         return (HashMap<String, Object>) this.requestGet(url, query);
     }
 
-    /** Show Broadcast 브로드캐스트 보기 **/
+    /**
+     * Show Broadcast 브로드캐스트 보기
+     * **/
     public HashMap<String, Object> getShowBroadcasts(String broadcast_key) throws Exception {
         if (broadcast_key == null && broadcast_key.isEmpty()) return null;
         String url = String.format("/%s/broadcasts/%s", kollusConfig.getServiceAccount(), broadcast_key);
