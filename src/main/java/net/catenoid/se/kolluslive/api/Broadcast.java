@@ -75,7 +75,13 @@ public class Broadcast extends ApiExecutor{
      * service_account_key (required) : 서비스 어카운트 키
      * broadcast_key (required)  : 브로드캐스트 키
      * **/
-    public HashMap<String, Object> getDeleteBroadcasts(String broadcast_key, String title) throws Exception {
+    public HashMap<String, Object> getDeleteBroadcasts(String broadcast_key) throws Exception {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        if(broadcast_key == null){
+            resultMap.put("error", -1);
+            resultMap.put("msg", "validation check is null");
+            return resultMap;
+        }
         String url = String.format("/%s/broadcasts/%s", kollusConfig.getServiceAccount(), broadcast_key);
 
         return (HashMap<String, Object>) this.requestDelete(url);
@@ -88,6 +94,12 @@ public class Broadcast extends ApiExecutor{
      * broadcast_key (required)  : 브로드캐스트 키
      * **/
     public HashMap<String, Object> getStartBroadcastsRecording(String broadcast_key) throws Exception {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        if(broadcast_key == null){
+            resultMap.put("error", -1);
+            resultMap.put("msg", "validation check is null");
+            return resultMap;
+        }
         String url = String.format("/%s/broadcasts/%s/duplicate-recording", kollusConfig.getServiceAccount(), broadcast_key);
 
         return (HashMap<String, Object>) this.requestPost(url, null, null);
@@ -99,7 +111,13 @@ public class Broadcast extends ApiExecutor{
      * service_account_key (required) : 서비스 어카운트 키
      * broadcast_key (required) : 브로드캐스트 키
      * **/
-    public HashMap<String, Object> getStopBroadcastsRecording(String broadcast_key, String title) throws Exception {
+    public HashMap<String, Object> getStopBroadcastsRecording(String broadcast_key) throws Exception {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        if(broadcast_key == null){
+            resultMap.put("error", -1);
+            resultMap.put("msg", "validation check is null");
+            return resultMap;
+        }
         String url = String.format("/%s/broadcasts/%s/duplicate-recording", kollusConfig.getServiceAccount(), broadcast_key);
 
         return (HashMap<String, Object>) this.requestDelete(url);
@@ -120,6 +138,12 @@ public class Broadcast extends ApiExecutor{
      * **/
     public HashMap<String, Object> getChannelBroadcastsList(String channel_key, String keyword, String order, Integer per_page, String start_date,
                                                             String end_date) throws Exception {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        if(channel_key == null){
+            resultMap.put("error", -1);
+            resultMap.put("msg", "validation check is null");
+            return resultMap;
+        }
         String url = String.format("/%s/channels/%s/broadcasts", kollusConfig.getServiceAccount(), channel_key);
         MultiValueMap<String, String> query = new LinkedMultiValueMap<String, String>();
         if (keyword != null && !keyword.isEmpty()) query.add("keyword", keyword);
