@@ -11,8 +11,12 @@ import java.util.HashMap;
 @Component
 public class Channel extends ApiExecutor {
 
-    /** Channel List 채널 리스트
-     * service_account_key : 서비스계정키
+    /** Channel List 채널 리스트(GET)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스계정키
+     *
+     * (----- query -----)
      * keyword : 키워드
      * order
      * per_page
@@ -33,12 +37,17 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestGet(url, query);
     }
 
-    /** Create Channel 채널 생성
-     * title : 채널명
-     * customer_code : 고객코드
-     * concurrently_viewer_limit : 동시 시청자수 제한
-     * is_shared : 공개여부
-     * live_media_profile_group_key : 라이브 인코딩 프로파일 그룹 키
+    /** Create Channel 채널 생성(POST)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스계정키
+     *
+     * (----- Request Body -----)
+     * title (required) : 채널명
+     * customer_code (required) : 고객코드
+     * concurrently_viewer_limit (required) : 동시 시청자수 제한
+     * is_shared (required) : 공개여부
+     * live_media_profile_group_key (required) : 라이브 인코딩 프로파일 그룹 키
      * meta_title_pattern : 메타 정보 제목
      * meta_description : 메타 정보 내용
      * recording_file_policy : 녹화파일 정책 0: Not Used, 1: Segment, 3: Segment + Duplidate Recording
@@ -69,9 +78,11 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestPost(url, null, requestBody);
     }
 
-    /** Show Channel 채널 보기
-     * service_account_key : 서비스계정키
-     * channel_key : 채널키
+    /** Show Channel 채널 보기(GET)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스계정키
+     * channel_key (required) : 채널키
      * **/
     public HashMap<String, Object> showChannels(String channel_key) throws Exception {
         String url = String.format("/%s/channels/%s", kollusConfig.getServiceAccount(), channel_key);
@@ -79,9 +90,13 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestGet(url, null);
     }
 
-    /** Update Channel 채널 수정
-     * service_account_key : 서비스 어카운트 키
-     * channel_key : 채널키
+    /** Update Channel 채널 수정(PUT)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널키
+     *
+     * (----- Request Body -----)
      * title : title
      * customer_code : 고객코드
      * concurrently_viewer_limit : 동시 시청자수 제한
@@ -115,9 +130,11 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestPut(url, null, requestBody);
     }
 
-    /** Remove Channel 채널 삭제
-     * service_account_key : 서비스 어카운트 키
-     * channel_key : 채널키
+    /** Remove Channel 채널 삭제(DELETE)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널키
      * **/
     public HashMap<String, Object> removeChannels(String channel_key) throws Exception {
         String url = String.format("/%s/channels/%s", kollusConfig.getServiceAccount(), channel_key);
@@ -125,9 +142,11 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestDelete(url);
     }
 
-    /** Show Channel Chatting Info 채널 채팅 정보 보기
-     * service_account_key : 서비스계정키
-     * channel_key : 채널키
+    /** Show Channel Chatting Info 채널 채팅 정보 보기(GET)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스계정키
+     * channel_key (required) : 채널키
      * **/
     public HashMap<String, Object> showChannelsChattingInfo(String channel_key) throws Exception {
         String url = String.format("/%s/channels/%s/chatting-info", kollusConfig.getServiceAccount(), channel_key);
@@ -135,9 +154,11 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestGet(url, null);
     }
 
-    /** Restore Channel 채널 복원
-     * service_account_key : 서비스계정키
-     * channel_key : 채널키
+    /** Restore Channel 채널 복원(PUT)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스계정키
+     * channel_key (required) : 채널키
      * **/
     public HashMap<String, Object> restoreChannels(String channel_key) throws Exception {
         String url = String.format("/%s/channels/%s/restore", kollusConfig.getServiceAccount(), channel_key);
@@ -145,9 +166,11 @@ public class Channel extends ApiExecutor {
         return (HashMap<String, Object>) this.requestPut(url, null, null);
     }
 
-    /** Trash Channel 채널 숨김
-     * service_account_key : 서비스계정키
-     * channel_key : 채널키
+    /** Trash Channel 채널 숨김(PUT)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스계정키
+     * channel_key (required) : 채널키
      * **/
     public HashMap<String, Object> trashChannels(String channel_key) throws Exception {
         String url = String.format("/%s/channels/%s/trash", kollusConfig.getServiceAccount(), channel_key);
