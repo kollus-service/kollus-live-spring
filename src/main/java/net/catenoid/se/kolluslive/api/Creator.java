@@ -9,9 +9,13 @@ import java.util.HashMap;
 @Component
 public class Creator extends ApiExecutor{
 
-    /** Creator List 크리에이터 리스트
-     * service_account_key : 서비스 어카운트 키
-     * channel_key : 채널 키
+    /** Creator List 크리에이터 리스트(GET)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널 키
+     *
+     * (----- query -----)
      * keyword : 검색어
      * **/
     public HashMap<String, Object> getCreatorList(String channel_key, String keyword) throws Exception {

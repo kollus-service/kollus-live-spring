@@ -9,9 +9,11 @@ import java.util.HashMap;
 @Component
 public class Syndication extends ApiExecutor{
 
-    /** Syndication List 신디케이션 리스트
-     * service_account_key : 서비스 어카운트 키
-     * channel_key : 채널 키
+    /** Syndication List 신디케이션 리스트(GET)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널 키
      * **/
     public HashMap<String, Object> getSyndicationList(String channel_key) throws Exception {
         String url = String.format("/%s/channels/%s/syndications", kollusConfig.getServiceAccount(), channel_key);
@@ -19,13 +21,17 @@ public class Syndication extends ApiExecutor{
         return (HashMap<String, Object>) this.requestGet(url, null);
     }
 
-    /** Create Syndication 신디케이션 생성
-     * service_account_key : 서비스 어카운트 키
-     * channel_key  : 채널 키
-     * title : 제목
-     * link : 링크
-     * stream_name : 스트림키
-     * status : 사용여부
+    /** Create Syndication 신디케이션 생성(POST)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널 키
+     *
+     * (----- Request Body -----)
+     * title (required) : 제목
+     * link (required) : 링크
+     * stream_name (required) : 스트림키
+     * status (required) : 사용여부
      * **/
     public HashMap<String, Object> createSyndication(String channel_key, String title, String link, String stream_name, Integer status) throws Exception {
         String url = String.format("/%s/channels/%s/syndications", kollusConfig.getServiceAccount(), channel_key);
@@ -38,10 +44,12 @@ public class Syndication extends ApiExecutor{
         return (HashMap<String, Object>) this.requestPost(url, null, requestBody);
     }
 
-    /** Show Syndication 신디케이션 보기
-     * service_account_key : 서비스 어카운트 키
-     * channel_key : 채널 키
-     * syndication_id : 신디케이션 ID
+    /** Show Syndication 신디케이션 보기(GET)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널 키
+     * syndication_id (required) : 신디케이션 ID
      * **/
     public HashMap<String, Object> showSyndication(String channel_key, Integer syndication_id) throws Exception {
         String url = String.format("/%s/channels/%s/syndications/%s", kollusConfig.getServiceAccount(), channel_key, syndication_id);
@@ -49,10 +57,14 @@ public class Syndication extends ApiExecutor{
         return (HashMap<String, Object>) this.requestGet(url, null);
     }
 
-    /** Update Syndication 신디케이션 수정
-     * service_account_key : 서비스 어카운트 키
-     * channel_key  : 채널 키
-     * syndication_id : 신디케이션 ID
+    /** Update Syndication 신디케이션 수정(PUT)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널 키
+     * syndication_id (required) : 신디케이션 ID
+     *
+     * (----- Request Body -----)
      * title : 제목
      * link : 링크
      * stream_name : 스트림키
@@ -69,10 +81,12 @@ public class Syndication extends ApiExecutor{
         return (HashMap<String, Object>) this.requestPut(url, null, requestBody);
     }
 
-    /** Remove Syndication 신디케이션 삭제
-     * service_account_key : 서비스 어카운트 키
-     * channel_key : 채널 키
-     * syndication_id : 신디케이션 ID
+    /** Remove Syndication 신디케이션 삭제(DELETE)
+     *
+     * (----- path -----)
+     * service_account_key (required) : 서비스 어카운트 키
+     * channel_key (required) : 채널 키
+     * syndication_id (required) : 신디케이션 ID
      * **/
     public HashMap<String, Object> removeSyndication(String channel_key, Integer syndication_id) throws Exception {
         String url = String.format("/%s/channels/%s/syndications/%s", kollusConfig.getServiceAccount(), channel_key, syndication_id);
