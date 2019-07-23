@@ -6,59 +6,361 @@
     <title>Kollus Live Sample</title>
 </th:block>
 <th:block layout:fragment="content_body">
-    <h3>콜러스 라이브 플랫폼 샘플페이지</h3>
-    <div class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
-        <iframe id="page_player" class="embed-responsive-item" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe8ie2OxtU7UoU9KSoVhGsAC3peku6rmZyWDF3t60oyl2QIoNTEw" allowfullscreen></iframe>
+    <div class="col-8 offset-2 mt-2">
+        <div class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
+            <iframe id="page_player" class="embed-responsive-item" src=""
+                    allowfullscreen webkiallowfullscreen mozallowfullscreen>
+
+            </iframe>
+            <div id="cover" class="embed-responsive-item text-center">
+                <h1 class="mt-4">Kollus Live Player</h1>
+                <img src="https://ai-i3.infcdn.net/icons_siandroid/png/200/14027/14027585.png"/>
+                <h3>Catenoid Service Team</h3>
+            </div>
+            <div id="info" class="embed-responsive-item invisible" style="background-color: #FFF; opacity: 0.3;">
+                <div class="text-center d-block">
+                    <h2><i class="fa fa-clock"><span id="playtime"></span></i></h2>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-3">
+            <div class="btn-group ch-search">
+                <button class="btn btn-outline-primary" data-type="ch_all">전체<span class="badge badge-light">0</span>
+                </button>
+                <button class="btn btn-outline-danger" data-type="ch_on">방송중<span class="badge badge-light">0</span>
+                </button>
+                <button class="btn btn-outline-success" data-type="ch_off">방송중지<span class="badge badge-light">0</span>
+                </button>
+            </div>
+        </div>
+        <div id="carouselExampleControls" class="carousel slide col-6" data-ride="carousel">
+            <div class="carousel-inner">
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+        <div class="col-3">
+            <div class="form-group">
+                <label for="url">플레이어 이벤트
+                    <small> ::: 팝업플레이어는 불가</small>
+                </label>
+                <textarea class="form-control" rows="5" id="player_event"></textarea>
+            </div>
+        </div>
     </div>
 
-    <div id="ch_list" class="card-group">
+    <div class="row mt-3">
+        <div class="col-6 bg-light">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">만료시간(s)</span>
+                </div>
+                <input type="number" class="form-control" id="expt" value="5" min-value="1"/>
+            </div>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">사용자 아이디</span>
+                </div>
+                <input type="text" class="form-control" id="cuid"/>
+            </div>
 
-
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">프로파일</span>
+                </div>
+                <input type="text" class="form-control" id="pf"/>
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="autoplay">
+                    <label class="form-check-label" for="autoplay">
+                        자동재생 여부확인
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="infobox">
+                    <label class="form-check-label" for="infobox">
+                        재생 정보창 보이기
+                    </label>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">팝업넓이</span>
+                </div>
+                <input class="form-control" type="number" id="p_width" value="1024">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">팝업높이</span>
+                </div>
+                <input class="form-control" type="number" id="p_height" value="720">
+            </div>
+        </div>
+        <div class="col-6 bg-light">
+            <div>
+                <p class="text-center">만료시간</p>
+                <p class="text-center" id="expt-time"></p>
+                <p class="text-center small">서버와 시간편차가 생길수 있어 만료시간에서 1분정도의 오차는 발생할수 있습니다.</p>
+            </div>
+            <div class="form-group">
+                <label for="jwt">JWT</label>
+                <textarea class="form-control" rows="6" id="jwt"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="url">Play URL</label>
+                <textarea class="form-control" rows="3" id="url"></textarea>
+            </div>
+        </div>
     </div>
+
+    <div id="ch_list" class="card-columns mt-3">
+    </div>
+
 
 </th:block>
 <th:block layout:fragment="page_js">
+    <script type="text/javascript"
+            src="http://file.kollus.com/vgcontroller/vg-controller-client.latest.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {
+
+        function makeFullScreen(iframe, target) {
+            obj = document.getElementById(iframe);
+            if (obj.requestFullscreen) {
+                obj.requestFullscreen();
+            } else if (obj.msRequestFullscreen) {
+                obj.msRequestFullscreen();
+            } else if (obj.mozRequestFullScreen) {
+                obj.mozRequestFullScreen();
+            } else if (obj.webkitRequestFullscreen) {
+                obj.webkitRequestFullscreen();
+            }
+        }
+
+        function makeFullScreen_ie(iframe, target) {
+
+            var lmckey = $(target).data('lmckey');
+            var type = $(target).data('play');
+            var cuid = $('#cuid').val();
+            var url = '/api/jwt?lmckey=' + lmckey + ((cuid != undefined && cuid != '') ? ('&cuid=' + cuid) : '');
+
+            $.get(url, function (data) {
+                var res = JSON.parse(data);
+                $('#' + iframe).attr('src', res.url + '&a');
+            });
+
+
+            obj = document.getElementById(iframe);
+            if (obj.requestFullscreen) {
+                obj.requestFullscreen();
+            } else if (obj.msRequestFullscreen) {
+                obj.msRequestFullscreen();
+            } else if (obj.mozRequestFullScreen) {
+                obj.mozRequestFullScreen();
+            } else if (obj.webkitRequestFullscreen) {
+                obj.webkitRequestFullscreen();
+            }
+
+
+        }
+
+
+        function convertToDateTime(unixtimestamp) {
+
+
+            var date = new Date(unixtimestamp * 1000);
+            var year = date.getFullYear();
+            var month = ("0" + (date.getMonth() + 1)).substr(-2);
+            var day = ("0" + date.getDate()).substr(-2);
+            var hours = ("0" + date.getHours()).substr(-2);
+            var minutes = ("0" + date.getMinutes()).substr(-2);
+            var seconds = ("0" + date.getSeconds()).substr(-2);
+            return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+
+
+        }
+
+        function checkBrowser() { // 외부 라이브러리와 충돌을 막고자 모듈화.
+            // 브라우저 및 버전을 구하기 위한 변수들.
+            'use strict';
+            var agent = navigator.userAgent.toLowerCase(),
+                name = navigator.appName,
+                browser;
+
+            // MS 계열 브라우저를 구분하기 위함.
+            if (name === 'Microsoft Internet Explorer' || agent.indexOf('trident') > -1 || agent.indexOf('edge/') > -1) {
+                browser = 'ie';
+                if (name === 'Microsoft Internet Explorer') { // IE old version (IE 10 or Lower)
+                    agent = /msie ([0-9]{1,}[\.0-9]{0,})/.exec(agent);
+                    browser += parseInt(agent[1]);
+                } else { // IE 11+
+                    if (agent.indexOf('trident') > -1) { // IE 11
+                        browser += 11;
+                    } else if (agent.indexOf('edge/') > -1) { // Edge
+                        browser = 'edge';
+                    }
+                }
+            } else if (agent.indexOf('safari') > -1) { // Chrome or Safari
+                if (agent.indexOf('opr') > -1) { // Opera
+                    browser = 'opera';
+                } else if (agent.indexOf('chrome') > -1) { // Chrome
+                    browser = 'chrome';
+                } else { // Safari
+                    browser = 'safari';
+                }
+            } else if (agent.indexOf('firefox') > -1) { // Firefox
+                browser = 'firefox';
+            }
+
+            return browser;
+        }
+
+        function get_channels(search) {
+            $('.ch-search button').each(function (idx, item) {
+                $(item).removeClass('btn-dark');
+            })
+            $('.ch-search button[data-type="ch_' + search + '"]').addClass('btn-dark');
+
             $.get('/api/channel', function (data) {
                 var res = JSON.parse(data);
-                var ch_list = $('#ch_list');
+                var ch_list = $('.carousel-inner');
+                ch_list.empty();
+                var ch_all = 0, ch_on = 0, ch_off = 0;
+                var browser = checkBrowser();
+                var first = true;
                 $(res).each(function (index, item) {
-                    var c_onair =item.is_onair ? 'red' : 'black';
-                    var t_onair = item.is_onair ? 'On Air': 'Closed';
-                    var t_player = item.player ? '보안플레이어': '비보안 플레이어';
+                    ch_all += 1;
+                    if (item.is_onair) ch_on += 1;
+                    else ch_off += 1;
 
-                    var card = '<div class="card">' +
-                        '            <img src="' + item.snapshot + '" class="card-img-top" width="50px" height="50px" alt="' + item.ch_title + '">' +
-                        '            <div class="card-body">' +
-                        '                <h5 class="card-title">' + item.ch_title + '</h5>' +
-                        '<div class="btn-group">' +
-                        '<button type="button" class="btn btn-primary page-play" data-lmckey="' + item.ch_key + '">페이지 재생</button>' +
-                        '<button type="button" class="btn btn-warning popup-play" data-lmckey="' + item.ch_key + "\">팝업 재생</button></div>" +
-                        '<p class="card-text"><small class="text-muted ' + c_onair + '">' + t_onair + '</small></p>' +
-                    '<p class="card-text"><small class="text-muted">' + t_player + '</small></p>' +
-                        '            </div>' +
-                        '        </div>';
-                    ch_list.append($(card));
+                    var make = item.is_onair ? 'on' : 'off';
+
+
+                    if (search == 'all' || search == make) {
+
+                        var i_onair = item.is_onair ? '<p class="my-0 mt-2"><i class="fa fa-circle text-danger">[[ 방송중 ]]</i></p>' : '<p class="my-0 mt-2"><i class="fa fa-circle text-success">[[ 방송중지 ]]</i></p>';
+                        var i_player = item.player ? '<p class="my-0"><i class="fas fa-lock">보안플레이어</i></p>' : '<p class="my-0"><i class="fas fa-unlock">비보안플레이어</i></p>';
+                        var i_share = item.share ? '<p class="my-0"><i class="fas fa-share">공유채널</i></p>' : '<p class="my-0"><i class="fas fa-key">비공개 채널</i></p>';
+                        var item_active = first ? ' active' : '';
+                        first = false;
+
+
+                        var card = '<div class="carousel-item' + item_active + '">' +
+                            '<img src="' + item.snapshot + '" class="img-thumbnail rounded d-block w-100" style="object-fit: none; height:180px;" alt="' + item.ch_title + '">' +
+                            '<div class="carousel-caption d-none d-md-block py-0">' +
+                            '<div style="background-color: #FFF; opacity: 0.25; color: #000;">' + i_onair + i_player + i_share +
+                            '<h3 class="text-wrap">' + item.ch_title + '</h3></div>';
+                        if (item.is_onair) {
+                            card += '<div class="btn-group">' +
+                                '<button type="button" class="btn btn-primary btn-sm" data-play="page" data-lmckey="' + item.ch_key + '" title="페이지재생"><i class="fas fa-file-video"></i></button>' +
+                                '<button type="button" class="btn btn-warning btn-sm" data-play="popup" data-lmckey="' + item.ch_key + '" title="팝업 재생"><i class="fas fa-external-link-alt"></i></button>';
+                            if (browser.indexOf('ie') > -1 || browser.indexOf('edge') > -1) {
+                                card += '<button onclick="makeFullScreen_ie(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="ie_fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
+                            } else {
+                                card += '<button type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
+                            }
+                        }
+                        card += '</div></div>'
+
+                        ch_list.append($(card));
+                    }
                 });
+                $('.ch-search > button[data-type="ch_all"] > span').text(ch_all);
+                $('.ch-search > button[data-type="ch_on"] > span').text(ch_on);
+                $('.ch-search > button[data-type="ch_off"] > span').text(ch_off);
             })
+        }
 
-            $('#ch_list').on('click', 'button', function (e) {
+        function attachVgConttroller(player) {
+            var controller;
+            try {
+                controller = new VgControllerClient({
+                    target_window: document.getElementById(player).contentWindow
+                });
+                controller.on('ready', function () {
+                    log('Player Ready');
+                });
+                controller.on('ready', function () {
+                    log('Player Play');
+                });
+                controller.on('pause', function () {
+                    log('Player pause');
+                });
+                controller.on('screenchange', function (screen) {
+                    log('Player Screen change : ' + screen);
+                });
+                controller.on('progress', function (percent, position, duration) {
+                    $('#playtime').text(position);
+                });
+            } catch (e) {
 
+            }
+            return controller;
+        }
+
+        function log(msg) {
+            var log_msg = '[' + new Date() + ']' + msg + '\r\n';
+            $('#player_event').val($('#player_event').val() + log_msg)
+        }
+
+
+        $(document).ready(function () {
+            get_channels('all');
+
+            $('.ch-search').on('click', 'button', function (e) {
+                var search = $(this).data('type').replace('ch_', '');
+                get_channels(search);
+            });
+
+            $('#infobox').on('click', function () {
+                if ($('#infobox').is(':checked')) {
+                    $('#info').addClass('visible');
+                    $('#info').removeClass('invisible');
+                } else {
+                    $('#info').addClass('invisible');
+                    $('#info').removeClass('visible');
+                }
+            });
+
+            $('.carousel-inner').on('click', 'button:not([data-play="ie_fullscreen"])', function (e) {
+                $('#cover').addClass('invisible');
                 var lmckey = $(this).data('lmckey');
-                var type = $(this).attr('class').indexOf('page-play') > 0 ? 'page' : 'popup';
-                $.get('/api/jwt?lmckey='+lmckey, function(data){
+                var type = $(this).data('play');
+                var cuid = $('#cuid').val();
+                var expt = $('#expt').val();
+                var url = '/api/jwt?lmckey=' + lmckey;
+                url += ((cuid != undefined && cuid != '') ? ('&cuid=' + cuid) : '');
+                if (expt != undefined && expt > 0) url += "&expt=" + expt
+                $.get(url, function (data) {
                     var res = JSON.parse(data);
-                    if (type == 'page'){
-                        $('#page_player').attr('src', res.url);
-                    }
-                    else if (type == 'popup'){
-                        var popOption = "width=1024, height=720, resizable=no, scrollbars=no, status=no;";
-                        window.open(res.url,"",popOption);
-
+                    var payload = res.payload;
+                    var playUrl = res.url;
+                    if ($('#autoplay').is(':checked')) playUrl += '&a';
+                    $('#jwt').val(JSON.stringify(payload, null, '\t'));
+                    $('#url').val(playUrl);
+                    $('#expt-time').text(convertToDateTime(payload.expt));
+                    if (type == 'page') {
+                        $('#page_player').attr('src', playUrl);
+                        attachVgConttroller('page_player');
+                    } else if (type == 'fullscreen') {
+                        makeFullScreen('page_player', e.target);
+                        $('#page_player').attr('src', playUrl);
+                    } else if (type == 'popup') {
+                        var p_width = $('#p_width').val()
+                        var p_height = $('#p_height').val()
+                        var popOption = 'width=' + p_width + ', height=' + p_height + ', resizable=no, scrollbars=no, status=no, fullscreen=yes;';
+                        window.open(playUrl, "", popOption);
                     }
                 });
-
             })
         });
     </script>

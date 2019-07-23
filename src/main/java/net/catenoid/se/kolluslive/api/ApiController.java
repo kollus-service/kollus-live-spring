@@ -58,6 +58,7 @@ public class ApiController {
             Map<String, Object> item = new HashMap<String, Object>();
             item.put("ch_title", channel.get("title").toString());
             item.put("ch_key", channel.get("key").toString());
+            item.put("is_shared", Boolean.parseBoolean(channel.get("is_shared").toString()));
             Map<String, Object> broadcast = (Map<String, Object>)channel.get("latest_broadcast");
             if(!broadcast.isEmpty()){
                 item.put("is_onair", Boolean.parseBoolean(broadcast.get("is_onair").toString()));
@@ -74,6 +75,7 @@ public class ApiController {
                 item.put("snapshot", "https://i.ytimg.com/vi/6kCSVT3r_Qg/hqdefault.jpg");
             }
 
+
             summary.add(item);
         }
 
@@ -82,6 +84,7 @@ public class ApiController {
 
     @RequestMapping("/jwt")
     public String getPlayUrl(@RequestParam(value = "cuid", required = false) String cuid, // 사용자 아이디
+                             @RequestParam(value = "expt", required = false, defaultValue = "0") int expt, //  URL 만료시간 지정 파라미터 값
                              @RequestParam(value = "lmckey", required = true) String lmckey, //라이브 채널키
                              @RequestParam(value = "lmcpf", required = false) String lmcpf, // 화질 선택, 빈값일경우 자동 설정(ABR)
                              @RequestParam(value="title", required = false) String title, // 방송 제목
@@ -102,9 +105,15 @@ public class ApiController {
         Date now = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(now);
-        c.add(Calendar.MINUTE, kollusConfig.getExpt());
-        long expt = c.getTime().getTime();
-        payload.put("expt", expt);
+        if(expt !=0) {
+            c.add(Calendar.SECOND, expt);
+        }
+        else
+        {
+            c.add(Calendar.MINUTE, kollusConfig.getExpt());
+        }
+        long c_expt = c.getTime().getTime();
+        payload.put("expt", c_expt / 1000);
         ObjectMapper mapper = new ObjectMapper();
 
         //JWT 토큰 생성
@@ -123,9 +132,10 @@ public class ApiController {
         String signature = Base64.encodeBase64URLSafeString(signatureBytes);
         String jwtToken = String.format("%s.%s", content, signature);
 
-        Map<String, String> response = new HashMap<String, String>();
+        Map<String, Object> response = new HashMap<String, Object>();
         String playUrl = String.format("https://v-live-kr.kollus.com/s?jwt=%s&custom_key=%s", jwtToken, kollusConfig.getCustomKey());
         response.put("url", playUrl);
+        response.put("payload", payload);
         return mapper.writeValueAsString(response);
 
 

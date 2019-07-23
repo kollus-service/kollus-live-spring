@@ -21,6 +21,7 @@ public class KollusLiveApplication {
     ApplicationContext applicationContext;
 
     public static void main(String[] args) {
+
         SpringApplication.run(KollusLiveApplication.class, args);
     }
 
