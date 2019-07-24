@@ -7,7 +7,7 @@
 </th:block>
 <th:block layout:fragment="content_body">
     <div class="col-8 offset-2 mt-2">
-        <div class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
+        <div id="wrapper-player" class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
             <iframe id="page_player" class="embed-responsive-item" src=""
                     allowfullscreen webkiallowfullscreen mozallowfullscreen>
 
@@ -133,7 +133,7 @@
             src="http://file.kollus.com/vgcontroller/vg-controller-client.latest.min.js"></script>
     <script type="text/javascript">
 
-        function makeFullScreen(iframe, target) {
+        function makeFullScreen(iframe) {
             obj = document.getElementById(iframe);
             if (obj.requestFullscreen) {
                 obj.requestFullscreen();
@@ -147,30 +147,9 @@
         }
 
         function makeFullScreen_ie(iframe, target) {
-
-            var lmckey = $(target).data('lmckey');
-            var type = $(target).data('play');
-            var cuid = $('#cuid').val();
-            var url = '/api/jwt?lmckey=' + lmckey + ((cuid != undefined && cuid != '') ? ('&cuid=' + cuid) : '');
-
-            $.get(url, function (data) {
-                var res = JSON.parse(data);
-                $('#' + iframe).attr('src', res.url + '&a');
+            playUrl(target, function () {
+                makeFullScreen(iframe);
             });
-
-
-            obj = document.getElementById(iframe);
-            if (obj.requestFullscreen) {
-                obj.requestFullscreen();
-            } else if (obj.msRequestFullscreen) {
-                obj.msRequestFullscreen();
-            } else if (obj.mozRequestFullScreen) {
-                obj.mozRequestFullScreen();
-            } else if (obj.webkitRequestFullscreen) {
-                obj.webkitRequestFullscreen();
-            }
-
-
         }
 
 
@@ -262,12 +241,13 @@
                         if (item.is_onair) {
                             card += '<div class="btn-group">' +
                                 '<button type="button" class="btn btn-primary btn-sm" data-play="page" data-lmckey="' + item.ch_key + '" title="페이지재생"><i class="fas fa-file-video"></i></button>' +
-                                '<button type="button" class="btn btn-warning btn-sm" data-play="popup" data-lmckey="' + item.ch_key + '" title="팝업 재생"><i class="fas fa-external-link-alt"></i></button>';
-                            if (browser.indexOf('ie') > -1 || browser.indexOf('edge') > -1) {
-                                card += '<button onclick="makeFullScreen_ie(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="ie_fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
-                            } else {
-                                card += '<button type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
-                            }
+                                '<button type="button" class="btn btn-warning btn-sm" data-play="popup" data-lmckey="' + item.ch_key + '" title="팝업 재생"><i class="fas fa-external-link-alt"></i></button>' +
+                                '<button onclick="fullscreenPlayer(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
+                            // if (browser.indexOf('ie') > -1 || browser.indexOf('edge') > -1) {
+                            //     card += '<button onclick="makeFullScreen_ie(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="ie_fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
+                            // } else {
+                            //     card += '<button type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
+                            // }
                         }
                         card += '</div></div>'
 
@@ -312,6 +292,54 @@
             $('#player_event').val($('#player_event').val() + log_msg)
         }
 
+        function playUrl(target, fn) {
+            $('#cover').addClass('invisible');
+            var lmckey = $(target).data('lmckey');
+            var cuid = $('#cuid').val();
+            var expt = $('#expt').val();
+
+            /*라이브 URL 생성 API*/
+            var url = '/api/jwt?lmckey=' + lmckey;
+            url += ((cuid != undefined && cuid != '') ? ('&cuid=' + cuid) : '');
+            if (expt != undefined && expt > 0) url += "&expt=" + expt
+
+            $.get(url, function (data) {
+                var res = JSON.parse(data);
+                var payload = res.payload;
+                var playUrl = res.url;
+                if ($('#autoplay').is(':checked')) playUrl += '&a';
+                $('#jwt').val(JSON.stringify(payload, null, '\t'));
+                $('#url').val(playUrl);
+                $('#expt-time').text(convertToDateTime(payload.expt));
+                fn(playUrl);
+                // if (type == 'page') {
+                //     $('#' + iframe).attr('src', playUrl);
+                //     attachVgConttroller(iframe);
+                // } else if (type == 'fullscreen') {
+                //     $('#page_player').attr('src', playUrl);
+                // } else if (type == 'popup') {
+                //     var p_width = $('#p_width').val()
+                //     var p_height = $('#p_height').val()
+                //     var popOption = 'width=' + p_width + ', height=' + p_height + ', resizable=no, scrollbars=no, status=no, fullscreen=yes;';
+                //     window.open(playUrl, "", popOption);
+                // }
+            });
+        }
+
+        function fullscreenPlayer(iframe, target) {
+            makeFullScreen(iframe);
+            playUrl(target, function (url) {
+                $('#' + iframe).attr('src', url);
+                attachVgConttroller(iframe);
+            });
+        }
+
+        function recreate_iframe(iframe) {
+            $('#' + iframe).remove();
+            $('#wrapper-player').prepend('<iframe id="page_player" class="embed-responsive-item" src="" allowfullscreen webkiallowfullscreen mozallowfullscreen></iframe>')
+
+        }
+
 
         $(document).ready(function () {
             get_channels('all');
@@ -331,36 +359,21 @@
                 }
             });
 
-            $('.carousel-inner').on('click', 'button:not([data-play="ie_fullscreen"])', function (e) {
-                $('#cover').addClass('invisible');
-                var lmckey = $(this).data('lmckey');
-                var type = $(this).data('play');
-                var cuid = $('#cuid').val();
-                var expt = $('#expt').val();
-                var url = '/api/jwt?lmckey=' + lmckey;
-                url += ((cuid != undefined && cuid != '') ? ('&cuid=' + cuid) : '');
-                if (expt != undefined && expt > 0) url += "&expt=" + expt
-                $.get(url, function (data) {
-                    var res = JSON.parse(data);
-                    var payload = res.payload;
-                    var playUrl = res.url;
-                    if ($('#autoplay').is(':checked')) playUrl += '&a';
-                    $('#jwt').val(JSON.stringify(payload, null, '\t'));
-                    $('#url').val(playUrl);
-                    $('#expt-time').text(convertToDateTime(payload.expt));
-                    if (type == 'page') {
-                        $('#page_player').attr('src', playUrl);
+            $('.carousel-inner').on('click', 'button:not([data-play="fullscreen"])', function (e) {
+                playUrl(e.currentTarget, function (url) {
+                    var play = $(e.currentTarget).data('play');
+                    if (play == 'page') {
+                        recreate_iframe('page_player');
+                        $('#page_player').attr('src', url);
                         attachVgConttroller('page_player');
-                    } else if (type == 'fullscreen') {
-                        makeFullScreen('page_player', e.target);
-                        $('#page_player').attr('src', playUrl);
-                    } else if (type == 'popup') {
+                    } else if (play == 'popup') {
                         var p_width = $('#p_width').val()
                         var p_height = $('#p_height').val()
                         var popOption = 'width=' + p_width + ', height=' + p_height + ', resizable=no, scrollbars=no, status=no, fullscreen=yes;';
-                        window.open(playUrl, "", popOption);
+                        window.open(url, "", popOption);
                     }
-                });
+                })
+
             })
         });
     </script>
