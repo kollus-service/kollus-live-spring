@@ -105,6 +105,10 @@
                 </div>
                 <input class="form-control" type="number" id="p_height" value="720">
             </div>
+            <div class="alert alert-info d-flex" role="alert">
+                <p class="text-center bold mr-1 align-middle">프로파일 설정</p>
+                <p class="small align-middle">프로파일 라이브 서비스설정에 활성화 되어 있는 프로파일 명으로 지정해야합니다. 예(720p, 480p 등)</p>
+            </div>
         </div>
         <div class="col-6 bg-light">
             <div>
@@ -297,11 +301,12 @@
             var lmckey = $(target).data('lmckey');
             var cuid = $('#cuid').val();
             var expt = $('#expt').val();
-
+            var pf = $('#pf').val();
             /*라이브 URL 생성 API*/
             var url = '/api/jwt?lmckey=' + lmckey;
             url += ((cuid != undefined && cuid != '') ? ('&cuid=' + cuid) : '');
             if (expt != undefined && expt > 0) url += "&expt=" + expt
+            if (pf != undefined && pf != 0) url += "&lmcpf=" + pf
 
             $.get(url, function (data) {
                 var res = JSON.parse(data);
