@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="common/default">
+
+<th:block layout:fragment="html_head">
+    <title>Kollus Live Sample</title>
+</th:block>
+<th:block layout:fragment="content_body">
+    <div class="w-100 h-100">
+        <div id="wrapper-player" class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
+            <iframe id="page_player" class="embed-responsive-item" th:src="${path}"
+                allowfullscreen webkiallowfullscreen mozallowfullscreen>
+            </iframe>
+            <div id="cover" class="embed-responsive-item text-center invisible">
+                <h1 class="mt-4">Kollus Live Player</h1>
+                <img src="https://ai-i3.infcdn.net/icons_siandroid/png/200/14027/14027585.png"/>
+                <h3>Catenoid Service Team</h3>
+            </div>
+
+            <div id="controls" class="embed-responsive-item text-center invisible h-25"
+                 style="background-color: #000; opacity: 0.5;">
+                <div class="d-flex justify-content-end" style="opacity: 1;">
+                    <div class="btn-group">
+                        <button id="show_info" class="bg-info">SHOW INFO</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="info" class="embed-responsive-item invisible" style="background-color: #FFF; opacity: 0.3;">
+                <div class="text-center d-block">
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <h2><i class="fa fa-clock"><span id="playtime"></span></i></h2>
+                    <div class="form-group">
+                        <label for="player_event">플레이어 이벤트
+                        </label>
+                        <textarea class="form-control" rows="10" id="player_event"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block layout:fragment="page_js">
+    <script type="text/javascript"
+            src="http://file.kollus.com/vgcontroller/vg-controller-client.latest.min.js"></script>
+    <script type="text/javascript">
+        function attachVgConttroller(player) {
+            var controller;
+            try {
+                controller = new VgControllerClient({
+                    target_window: document.getElementById(player).contentWindow
+                });
+                controller.on('ready', function () {
+                    log('Player Ready');
+                });
+                controller.on('ready', function () {
+                    log('Player Play');
+                });
+                controller.on('pause', function () {
+                    log('Player pause');
+                });
+                controller.on('screenchange', function (screen) {
+                    log('Player Screen change : ' + screen);
+                });
+                controller.on('progress', function (percent, position, duration) {
+                    $('#playtime').text(position);
+                });
+            } catch (e) {
+
+            }
+            return controller;
+        }
+
+        function log(msg) {
+            var log_msg = '[' + new Date() + ']' + msg + '\r\n';
+            $('#player_event').val($('#player_event').val() + log_msg)
+        }
+
+        var is_show_info = false;
+        $(document).ready(function () {
+            $('footer').remove();
+            $($('body').find('div').get(0)).removeClass('container').addClass('container-fluid mx-0 my-0 p-0');
+
+            attachVgConttroller('page_player');
+            $(document).on('mouseenter', '#page_player', function () {
+                $('#controls').addClass('visible');
+                $('#controls').removeClass('invisible');
+                setTimeout(function(){
+                    $('#controls').addClass('invisible');
+                    $('#controls').removeClass('visible');
+                }, 5000)
+            });
+
+
+            $('#show_info').on('click', function () {
+                if (!is_show_info) {
+                    $('#info').addClass('visible');
+                    $('#info').removeClass('invisible');
+                } else {
+                    $('#info').addClass('invisible');
+                    $('#info').removeClass('visible');
+                }
+                is_show_info = !is_show_info
+            });
+            $('.close').on('click', function () {
+                $('#info').addClass('invisible');
+                $('#info').removeClass('visible');
+                is_show_info = false;
+            });
+        });
+    </script>
+</th:block>
+</html>

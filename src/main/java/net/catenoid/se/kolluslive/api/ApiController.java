@@ -86,7 +86,7 @@ public class ApiController {
     public String getPlayUrl(@RequestParam(value = "cuid", required = false) String cuid, // 사용자 아이디
                              @RequestParam(value = "expt", required = false, defaultValue = "0") int expt, //  URL 만료시간 지정 파라미터 값
                              @RequestParam(value = "lmckey", required = true) String lmckey, //라이브 채널키
-                             @RequestParam(value = "lmcpf", required = false) String lmcpf, // 화질 선택, 빈값일경우 자동 설정(ABR)
+                             @RequestParam(value = "lmpf", required = false) String lmpf, // 화질 선택, 빈값일경우 자동 설정(ABR)
                              @RequestParam(value="title", required = false) String title, // 방송 제목
                              @RequestParam(value="seek", required = false) boolean seek //플레이어 SEEK 가능 여부 설정
     ) throws Exception{
@@ -97,7 +97,7 @@ public class ApiController {
         if(cuid != null && !cuid.isEmpty()) payload.put("cuid", cuid);
         if(lmckey.isEmpty()) throw new Exception("올바른 채널키를 넣어주세요");
         payload.put("lmckey", lmckey);
-        if(lmcpf != null && !lmcpf.isEmpty()) payload.put("lmcpf", lmcpf);
+        if(lmpf != null && !lmpf.isEmpty()) payload.put("lmpf", lmpf);
         if(title != null && !title.isEmpty()) payload.put("title", title);
         if(seek) payload.put("seek", seek);
 
