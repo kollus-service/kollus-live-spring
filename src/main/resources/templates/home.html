@@ -158,8 +158,6 @@
 
 
         function convertToDateTime(unixtimestamp) {
-
-
             var date = new Date(unixtimestamp * 1000);
             var year = date.getFullYear();
             var month = ("0" + (date.getMonth() + 1)).substr(-2);
@@ -168,44 +166,8 @@
             var minutes = ("0" + date.getMinutes()).substr(-2);
             var seconds = ("0" + date.getSeconds()).substr(-2);
             return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
-
-
         }
 
-        function checkBrowser() { // 외부 라이브러리와 충돌을 막고자 모듈화.
-            // 브라우저 및 버전을 구하기 위한 변수들.
-            'use strict';
-            var agent = navigator.userAgent.toLowerCase(),
-                name = navigator.appName,
-                browser;
-
-            // MS 계열 브라우저를 구분하기 위함.
-            if (name === 'Microsoft Internet Explorer' || agent.indexOf('trident') > -1 || agent.indexOf('edge/') > -1) {
-                browser = 'ie';
-                if (name === 'Microsoft Internet Explorer') { // IE old version (IE 10 or Lower)
-                    agent = /msie ([0-9]{1,}[\.0-9]{0,})/.exec(agent);
-                    browser += parseInt(agent[1]);
-                } else { // IE 11+
-                    if (agent.indexOf('trident') > -1) { // IE 11
-                        browser += 11;
-                    } else if (agent.indexOf('edge/') > -1) { // Edge
-                        browser = 'edge';
-                    }
-                }
-            } else if (agent.indexOf('safari') > -1) { // Chrome or Safari
-                if (agent.indexOf('opr') > -1) { // Opera
-                    browser = 'opera';
-                } else if (agent.indexOf('chrome') > -1) { // Chrome
-                    browser = 'chrome';
-                } else { // Safari
-                    browser = 'safari';
-                }
-            } else if (agent.indexOf('firefox') > -1) { // Firefox
-                browser = 'firefox';
-            }
-
-            return browser;
-        }
 
         function get_channels(search) {
             $('.ch-search button').each(function (idx, item) {
@@ -218,7 +180,6 @@
                 var ch_list = $('.carousel-inner');
                 ch_list.empty();
                 var ch_all = 0, ch_on = 0, ch_off = 0;
-                var browser = checkBrowser();
                 var first = true;
                 $(res).each(function (index, item) {
                     ch_all += 1;
@@ -247,12 +208,8 @@
                                 '<button type="button" class="btn btn-primary btn-sm" data-play="page" data-lmckey="' + item.ch_key + '" title="페이지재생"><i class="fas fa-file-video"></i></button>' +
                                 '<button type="button" class="btn btn-warning btn-sm" data-play="popup" data-lmckey="' + item.ch_key + '" title="팝업 재생"><i class="fas fa-external-link-alt"></i></button>' +
                                 '<button onclick="fullscreenPlayer(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button>' +
-                                '<button type="button" class="btn btn-success btn-sm" data-play="popup_vg" data-lmckey="' + item.ch_key + '" title="팝업재생(컨트롤러)"><i class="fas fa-photo-video"></i></button></div>';
-                            // if (browser.indexOf('ie') > -1 || browser.indexOf('edge') > -1) {
-                            //     card += '<button onclick="makeFullScreen_ie(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="ie_fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
-                            // } else {
-                            //     card += '<button type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button></div>';
-                            // }
+                                '<button type="button" class="btn btn-success btn-sm" data-play="popup_vg" data-lmckey="' + item.ch_key + '" title="팝업재생(컨트롤러)"><i class="fas fa-photo-video"></i></button>'+
+                                '<button type="button" class="btn btn-success btn-sm" data-play="autodetect" data-lmckey="' + item.ch_key + '" title="분기처리"><i class="fas fa-robot"></i></button></div>';
                         }
                         card += '</div></div>'
 
@@ -318,17 +275,6 @@
                 $('#url').val(playUrl);
                 $('#expt-time').text(convertToDateTime(payload.expt));
                 fn(playUrl);
-                // if (type == 'page') {
-                //     $('#' + iframe).attr('src', playUrl);
-                //     attachVgConttroller(iframe);
-                // } else if (type == 'fullscreen') {
-                //     $('#page_player').attr('src', playUrl);
-                // } else if (type == 'popup') {
-                //     var p_width = $('#p_width').val()
-                //     var p_height = $('#p_height').val()
-                //     var popOption = 'width=' + p_width + ', height=' + p_height + ', resizable=no, scrollbars=no, status=no, fullscreen=yes;';
-                //     window.open(playUrl, "", popOption);
-                // }
             });
         }
 
@@ -346,8 +292,170 @@
 
         }
 
+        if (!String.prototype.format) {
+            String.prototype.format = function () {
+                var args = arguments;
+                return this.replace(/{(\d+)}/g, function (match, number) {
+                    return typeof args[number] != 'undefined'
+                        ? args[number]
+                        : match
+                        ;
+                });
+            };
+        }
+
+        //
+        function playurltoappurl(url) {
+            var parser = document.createElement('a');
+            parser.href = url
+            var app_url = parser.protocol + '://' + parser.hostname + '/si' + parser.search;
+            return encodeURIComponent(app_url);
+        }
+        //Windows, Browser 환경에서의 플레이어 호출
+        function playerInBrowser(url, options) {
+            function makeWindowOption(width, height, windowOptions) {
+                return 'width=' + width + ', height=' + height + ', ' + windowOptions;
+            }
+
+            if (options.type == 'embed') {
+                if (!options.frame) {
+                    window.open(url, makeWindowOption(options.width, options.height, options.window));
+                } else {
+                    var frame = document.getElementById(options.frame);
+                    frame.setAttribute('src', url);
+                }
+            } else if (options.type == 'popup') {
+                var p_url = options.popup_url ? popup_url.replace('{}', encodeURIComponent(url)) : url;
+                window.open(url, makeWindowOption(options.width, options.height, options.window));
+            } else {
+                throw 'Not support Type';
+            }
+        }
+
+        /***
+         *
+         * @function 모바일 환경에서 콜러스 플레이어 호출
+         * @param url 재생 URL
+         *
+         * 모바일 웹에서 앱을 호출하기위해서는 custom URL schem을 이용함.
+         * app이 설치가 안되었을경우 URL 호출후 일정시간동안 앱호출에대한 반응 확인후 반응이 없을때 store로 이동
+         * Dependency :
+         * tui-apploader : https://uicdn.toast.com/tui-app-loader/latest/tui-app-loader.js
+         * ua-parser : https://cdn.jsdelivr.net/npm/ua-parser-js@0/dist/ua-parser.min.js
+         * tui-code-snippet: https://uicdn.toast.com/tui.code-snippet/latest/tui-code-snippet.js
+         */
+        function callPlayerInMobile(url) {
+            var AppLoader = tui.AppLoader;
+            var loader = new AppLoader();
+            var osName = new UAParser().getResult().os.name;
+            loader.exec({
+                ios: {
+                    scheme: 'kollus://path?url=' + url,
+                    url: "https://itunes.apple.com/app/id760006888"
+                },
+                android: {
+                    intentURI: 'kollus://path?url=' + url
+                },
+                timerSet: {
+                    ios: 4000,
+                    android: 4000
+                },
+                etcCallback: function() {
+                    if (osName !== 'iOS' && osName !== 'Android') {
+                        alert('모바일 단말에서 실행하셔야 합니다.');
+                    }
+                },
+                notFoundCallback: function() {
+                    if (osName === 'iOS') {
+                        window.location.href = 'https://itunes.apple.com/app/id760006888';
+                    }
+                    else if(osName =='Android'){
+                        window.location.href = 'market://details?id=com.kollus.media';
+                    }
+                }
+            });
+        }
+
+        /***
+         *
+         * 플레이어 종류
+         * Window - HTML5 플레이어(v4a) : 브라우저 위에서 동작하는 플레이어, 페이지에 임베드, 팝업페이지 임베드, Player URL 자체로도 플레이어 동작
+         *                              대상 브라우저 : IE 11 이상, Edge, Chrome, Fireforox, Opera 등 HTML5과 HLS가 동시에 지원되는 환경
+         *        - 어픞리케이션 플레이어(v3e) : 어플리케이션 형태의 플레이어
+         *                                  대상 브라우저 : IE 10 이상, HTML5과 HLS가 동시에 지원지 되지않는 환경
+         * MAC - 어플리케이션 플레이어 : 어플리케이션 형태
+         * 모바일(iOS, Android) 전용 플레이어 : 앱형태의 플레이어
+         *
+         * @function OS/브라우저의 종류에 따른 플레이어 런처
+         * @param player_url : 백엔드에서생성한플레이어URL
+         * @param options : 플레이어생성옵션
+         *
+         * type : embed, popup, 기본값은 popup
+         * frame : 임베드 되는 iframe의 id 값이 없을경우 새로운 윈도우창으로 플레이어 주소만 호출
+         * type 이 embed 일경우 null 이면 팝업으로 동작
+         * width: 팝업 가로, 기본값: 1280
+         * height: 팝업 세로 , 기본값: 720
+         * window : 팝업 윈도우 속성 기본값 : menubar=no, directories=no, resizable=yes, status=no, scrollbars=no
+         * popup_url : 팝업시키는 URL이 별도로 있을 경우 기재, 없을때는 플레이어 새윈도우 창으로 플레이어 주소만 호출
+         *             ex) htts://sample.kollus.net/popup?path={}
+         *
+         *
+         */
+        function launch_player(player_url, options) {
+            var opts = {};
+            if (!options) {
+                opts.type = 'popup';
+                opts.width = 1280;
+                opts.height = 720;
+                opts.window = 'menubar=no, directories=no, resizable=yes, status=no, scrollbars=no';
+
+            } else {
+                opts.type = options.type ? options.type : 'popup';
+                opts.frame = options.frame;
+                opts.width = options.width ? options.width : 1280;
+                opts.height = options.height ? options.height : 720;
+                opts.window = options.window ? options.window : 'menubar=no, directories=no, resizable=yes, status=no, scrollbars=no';
+                opts.popup_url = options.popup_url;
+            }
+            //윈도우
+            if (platform.os.family.indexOf('Windows') > -1) {
+                //IE 10 이하 환경
+                if (platform.name.indexOf('IE') > -1 && parseInt(platform.version) < 11) {
+                    $.ajax({
+                        url: 'https://proxy.catoms.net/version',
+                        method: 'GET',
+                        success: function (data) {
+                            location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(player_url);
+
+                        },
+                        error: function () {
+                            location.href = 'https://v.kr.kollus.com/pc_player_install/agent';
+                        }
+                    });
+                }
+                //IE 10 이하 환경 이외의 브라우저
+                else {
+                    playerInBrowser(url, options);
+                }
+            }
+            //Mac
+            else if (platform.os.family.indexOf('OS X') > -1) {
+                location.href = 'kollus://path?url=' + playurltoappurl(player_url);
+            }
+            //Mobile
+            else if (platform.os.family.indexOf('iOS') > -1 || platform.os.family.indexOf('Android') > -1) {
+                callPlayerInMobile(playurltoappurl(player_url));
+
+            } else {
+                alert('지원하지 않는 플랫폼입니다.')
+            }
+
+        }
+
 
         $(document).ready(function () {
+            //console.log(platform.os);
+            //launch_player();
             get_channels('all');
 
             $('.ch-search').on('click', 'button', function (e) {
@@ -373,16 +481,23 @@
                         $('#page_player').attr('src', url);
                         attachVgConttroller('page_player');
                     } else if (play == 'popup') {
-                        var p_width = $('#p_width').val()
-                        var p_height = $('#p_height').val()
-                        var popOption = 'width=' + p_width + ', height=' + p_height + ', resizable=no, scrollbars=no, status=no, fullscreen=yes;';
+                        var p_width = $('#p_width').val();
+                        var p_height = $('#p_height').val();
+                        var popOption = 'width=' + p_width + ', height=' + p_height + ', menubar=no, directories=no, resizable=yes, status=no, scrollbars=no;';
                         window.open(url, "", popOption);
+                    } else if (play == 'popup_vg') {
+                        var p_width = $('#p_width').val();
+                        var p_height = $('#p_height').val();
+                        var popOption = 'width=' + p_width + ', height=' + p_height + ', menubar=no, directories=no, resizable=yes, status=no, scrollbars=no';
+                        window.open('/popup?path=' + encodeURIComponent(url), "", popOption);
                     }
-                    else if (play == 'popup_vg') {
-                        var p_width = $('#p_width').val()
-                        var p_height = $('#p_height').val()
-                        var popOption = 'width=' + p_width + ', height=' + p_height + ', resizable=no, scrollbars=no, status=no, fullscreen=yes;';
-                        window.open('/popup?path='+encodeURIComponent(url), "", popOption);
+                    else if(play == 'autodetect'){
+                        var options = {};
+                        options.type = 'popup';
+                        options.popup_url = '/popup?path={}';
+                        options.width = $('#p_width').val();
+                        options.height = $('#p_height').val();
+                        launch_player(url, options);
                     }
                 })
 
