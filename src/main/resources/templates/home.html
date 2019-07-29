@@ -6,7 +6,7 @@
     <title>Kollus Live Sample</title>
 </th:block>
 <th:block layout:fragment="content_body">
-    <div class="col-8 offset-2 mt-2">
+    <div class="col-md-8 offset-md-2 mt-2 col-sm-12">
         <div id="wrapper-player" class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
             <iframe id="page_player" class="embed-responsive-item" src=""
                     allowfullscreen webkiallowfullscreen mozallowfullscreen>
@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="row mt-2">
-        <div class="col-3">
+        <div class="col-md-3 col-sm-12">
             <div class="btn-group ch-search">
                 <button class="btn btn-outline-primary" data-type="ch_all">전체<span class="badge badge-light">0</span>
                 </button>
@@ -36,7 +36,7 @@
                 </button>
             </div>
         </div>
-        <div id="carouselExampleControls" class="carousel slide col-6" data-ride="carousel">
+        <div id="carouselExampleControls" class="carousel slide col-md-6 col-sm-12" data-ride="carousel">
             <div class="carousel-inner">
             </div>
             <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
@@ -48,7 +48,7 @@
                 <span class="sr-only">Next</span>
             </a>
         </div>
-        <div class="col-3">
+        <div class="col-md-3 col-sm-12">
             <div class="form-group">
                 <label for="player_event">플레이어 이벤트
                     <small> ::: 팝업플레이어는 불가</small>
@@ -59,7 +59,7 @@
     </div>
 
     <div class="row mt-3">
-        <div class="col-6 bg-light">
+        <div class="col-md-6 col-sm-12 bg-light">
             <div class="input-group">
                 <div class="input-group-prepend">
                     <span class="input-group-text">만료시간(s)</span>
@@ -110,7 +110,7 @@
                 <p class="small align-middle">프로파일 라이브 서비스설정에 활성화 되어 있는 프로파일 명으로 지정해야합니다. 예(720p, 480p 등)</p>
             </div>
         </div>
-        <div class="col-6 bg-light">
+        <div class="col-md-6 col-sm-12 bg-light">
             <div>
                 <p class="text-center">만료시간</p>
                 <p class="text-center" id="expt-time"></p>
@@ -126,11 +126,6 @@
             </div>
         </div>
     </div>
-
-    <div id="ch_list" class="card-columns mt-3">
-    </div>
-
-
 </th:block>
 <th:block layout:fragment="page_js">
     <script type="text/javascript"
@@ -308,7 +303,7 @@
         function playurltoappurl(url) {
             var parser = document.createElement('a');
             parser.href = url
-            var app_url = parser.protocol + '://' + parser.hostname + '/si' + parser.search;
+            var app_url = parser.protocol + '//' + parser.hostname + '/si' + parser.search;
             return encodeURIComponent(app_url);
         }
         //Windows, Browser 환경에서의 플레이어 호출
@@ -325,8 +320,8 @@
                     frame.setAttribute('src', url);
                 }
             } else if (options.type == 'popup') {
-                var p_url = options.popup_url ? popup_url.replace('{}', encodeURIComponent(url)) : url;
-                window.open(url, makeWindowOption(options.width, options.height, options.window));
+                var p_url = options.popup_url ? options.popup_url.replace('{}', encodeURIComponent(url)) : url;
+                window.open(p_url, makeWindowOption(options.width, options.height, options.window));
             } else {
                 throw 'Not support Type';
             }
@@ -422,10 +417,11 @@
                 //IE 10 이하 환경
                 if (platform.name.indexOf('IE') > -1 && parseInt(platform.version) < 11) {
                     $.ajax({
-                        url: 'https://proxy.catoms.net/version',
+                        url: 'https://proxy.catoms.net:8389/version',
                         method: 'GET',
                         success: function (data) {
-                            location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(player_url);
+                            //location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(player_url);
+                            location.href = 'http://127.0.0.1:8388/real/open?url=' + playurltoappurl(player_url);
 
                         },
                         error: function () {
@@ -435,12 +431,44 @@
                 }
                 //IE 10 이하 환경 이외의 브라우저
                 else {
-                    playerInBrowser(url, options);
+                    playerInBrowser(player_url, options);
                 }
             }
             //Mac
             else if (platform.os.family.indexOf('OS X') > -1) {
                 location.href = 'kollus://path?url=' + playurltoappurl(player_url);
+                // // try {
+                // //     var url_link = document.createElement('a');
+                // //     url_link.href = 'callto:kollus://path?url=' + playurltoappurl(player_url);
+                // //     url_link.click();
+                // // }catch(e){
+                // //     location.href = 'https://file.kollus.com/public/kollus_mac/KollusPlayer_OSX_v.1.0.1.3.pkg';
+                // // }
+                //
+                // // try{
+                // //     location.href = 'kollus://path?url=' + playurltoappurl(player_url);
+                // // }
+                // // catch(e){
+                // //     location.href = 'https://file.kollus.com/public/kollus_mac/KollusPlayer_OSX_v.1.0.1.3.pkg';
+                // // }
+                //
+                // $.ajax({
+                //     url: 'kollus://path?url=' + playurltoappurl(player_url),
+                //     method: 'HEAD',
+                //     datatype: 'jsonp',
+                //     success: function (data) {
+
+                //
+                //     },
+                //     error: function () {
+                //         location.href = 'https://file.kollus.com/public/kollus_mac/KollusPlayer_OSX_v.1.0.1.3.pkg';
+                //     }
+                // });
+
+
+
+
+
             }
             //Mobile
             else if (platform.os.family.indexOf('iOS') > -1 || platform.os.family.indexOf('Android') > -1) {
