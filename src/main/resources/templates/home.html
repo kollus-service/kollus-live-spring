@@ -9,7 +9,7 @@
     <div class="col-md-8 offset-md-2 mt-2 col-sm-12">
         <div id="wrapper-player" class="embed-responsive embed-responsive-16by9" style="border: 2px solid darkblue">
             <iframe id="page_player" class="embed-responsive-item" src=""
-                    allowfullscreen webkiallowfullscreen mozallowfullscreen>
+                    allowfullscreen webkiallowfullscreen mozallowfullscreen allow="autoplay">
 
             </iframe>
             <div id="cover" class="embed-responsive-item text-center">
@@ -321,7 +321,7 @@
                 }
             } else if (options.type == 'popup') {
                 var p_url = options.popup_url ? options.popup_url.replace('{}', encodeURIComponent(url)) : url;
-                window.open(p_url, makeWindowOption(options.width, options.height, options.window));
+                window.open(p_url, '_blank', makeWindowOption(options.width, options.height, options.window));
             } else {
                 throw 'Not support Type';
             }
@@ -512,12 +512,12 @@
                         var p_width = $('#p_width').val();
                         var p_height = $('#p_height').val();
                         var popOption = 'width=' + p_width + ', height=' + p_height + ', menubar=no, directories=no, resizable=yes, status=no, scrollbars=no;';
-                        window.open(url, "", popOption);
+                        window.open(url,'_blank', popOption);
                     } else if (play == 'popup_vg') {
                         var p_width = $('#p_width').val();
                         var p_height = $('#p_height').val();
                         var popOption = 'width=' + p_width + ', height=' + p_height + ', menubar=no, directories=no, resizable=yes, status=no, scrollbars=no';
-                        window.open('/popup?path=' + encodeURIComponent(url), "", popOption);
+                        window.open('/popup?path=' + encodeURIComponent(url), '_blank', popOption);
                     }
                     else if(play == 'autodetect'){
                         var options = {};
