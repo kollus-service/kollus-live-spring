@@ -203,8 +203,10 @@
                                 '<button type="button" class="btn btn-primary btn-sm" data-play="page" data-lmckey="' + item.ch_key + '" title="페이지재생"><i class="fas fa-file-video"></i></button>' +
                                 '<button type="button" class="btn btn-warning btn-sm" data-play="popup" data-lmckey="' + item.ch_key + '" title="팝업 재생"><i class="fas fa-external-link-alt"></i></button>' +
                                 '<button onclick="fullscreenPlayer(\'page_player\', this)" type="button" class="btn btn-danger btn-sm" data-play="fullscreen" data-lmckey="' + item.ch_key + '" title="전체화면재생"><i class="fas fa-compress"></i></button>' +
-                                '<button type="button" class="btn btn-success btn-sm" data-play="popup_vg" data-lmckey="' + item.ch_key + '" title="팝업재생(컨트롤러)"><i class="fas fa-photo-video"></i></button>'+
-                                '<button type="button" class="btn btn-success btn-sm" data-play="autodetect" data-lmckey="' + item.ch_key + '" title="분기처리"><i class="fas fa-robot"></i></button></div>';
+                                '<button type="button" class="btn btn-info btn-sm" data-play="popup_vg" data-lmckey="' + item.ch_key + '" title="팝업재생(컨트롤러)"><i class="fas fa-photo-video"></i></button>'+
+                                '<button type="button" class="btn btn-success btn-sm" data-play="autodetect" data-lmckey="' + item.ch_key + '" title="분기처리"><i class="fas fa-robot"></i></button>' +
+                                '<button type="button" class="btn btn-outline-success btn-dark btn-sm" data-play="autodetect_app" data-lmckey="' + item.ch_key + '" title="분기처리(APPLICATION)"><i class="fas fa-robot"></i></button></div>';
+
                         }
                         card += '</div></div>'
 
@@ -385,7 +387,7 @@
          * @param player_url : 백엔드에서생성한플레이어URL
          * @param options : 플레이어생성옵션
          *
-         * type : embed, popup, 기본값은 popup
+         * type : embed, popup, app 기본값은 popup , app으로 지정할경우 강제 어플리케이션 플레이어 호출
          * frame : 임베드 되는 iframe의 id 값이 없을경우 새로운 윈도우창으로 플레이어 주소만 호출
          * type 이 embed 일경우 null 이면 팝업으로 동작
          * width: 팝업 가로, 기본값: 1280
@@ -412,26 +414,50 @@
                 opts.window = options.window ? options.window : 'menubar=no, directories=no, resizable=yes, status=no, scrollbars=no';
                 opts.popup_url = options.popup_url;
             }
+            function call_window_app_player(pu){
+                $.ajax({
+                    url: 'https://proxy.catoms.net:8389/version', // 플레이어가 있는지 판단.
+                    method: 'GET',
+                    success: function (data) {
+                        if (window.location.protocol == 'http:'){
+                            location.href = 'http://127.0.0.1:8388/real/open?url=' + playurltoappurl(pu);
+                        }
+                        else {
+                            location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(pu);
+                        }
+
+                    },
+                    error: function () {
+                        //플레이어가 없을 경
+                        location.href = 'https://v.kr.kollus.com/pc_player_install/agent';
+                    }
+                });
+            }
             //윈도우
             if (platform.os.family.indexOf('Windows') > -1) {
                 //IE 10 이하 환경
-                if (platform.name.indexOf('IE') > -1 && parseInt(platform.version) < 11) {
-                    $.ajax({
-                        url: 'https://proxy.catoms.net:8389/version',
-                        method: 'GET',
-                        success: function (data) {
-                            //location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(player_url);
-                            location.href = 'http://127.0.0.1:8388/real/open?url=' + playurltoappurl(player_url);
+                if(opts.type == 'app'){
 
-                        },
-                        error: function () {
-                            location.href = 'https://v.kr.kollus.com/pc_player_install/agent';
-                        }
-                    });
                 }
-                //IE 10 이하 환경 이외의 브라우저
                 else {
-                    playerInBrowser(player_url, options);
+                    if (platform.name.indexOf('IE') > -1 && parseInt(platform.version) < 11) {
+                        $.ajax({
+                            url: 'https://proxy.catoms.net:8389/version',
+                            method: 'GET',
+                            success: function (data) {
+                                //location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(player_url);
+                                location.href = 'http://127.0.0.1:8388/real/open?url=' + playurltoappurl(player_url);
+
+                            },
+                            error: function () {
+                                location.href = 'https://v.kr.kollus.com/pc_player_install/agent';
+                            }
+                        });
+                    }
+                    //IE 10 이하 환경 이외의 브라우저
+                    else {
+                        playerInBrowser(player_url, options);
+                    }
                 }
             }
             //Mac
@@ -525,6 +551,14 @@
                         options.popup_url = '/popup?path={}';
                         options.width = $('#p_width').val();
                         options.height = $('#p_height').val();
+                        launch_player(url, options);
+                    }
+                    else if(play == 'autodetect_app'){
+                        var options = {};
+                        options.type = 'app';
+                        // options.popup_url = '/popup?path={}';
+                        // options.width = $('#p_width').val();
+                        // options.height = $('#p_height').val();
                         launch_player(url, options);
                     }
                 })
