@@ -437,22 +437,12 @@
             if (platform.os.family.indexOf('Windows') > -1) {
                 //IE 10 이하 환경
                 if(opts.type == 'app'){
+                    call_window_app_player(player_url);
 
                 }
                 else {
                     if (platform.name.indexOf('IE') > -1 && parseInt(platform.version) < 11) {
-                        $.ajax({
-                            url: 'https://proxy.catoms.net:8389/version',
-                            method: 'GET',
-                            success: function (data) {
-                                //location.href = 'https://proxy.catoms.net:8389/real/open?url=' + playurltoappurl(player_url);
-                                location.href = 'http://127.0.0.1:8388/real/open?url=' + playurltoappurl(player_url);
-
-                            },
-                            error: function () {
-                                location.href = 'https://v.kr.kollus.com/pc_player_install/agent';
-                            }
-                        });
+                        call_window_app_player(player_url);
                     }
                     //IE 10 이하 환경 이외의 브라우저
                     else {
