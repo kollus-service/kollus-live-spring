@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kollus-live-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+        - kollus-live-test.kollus.com
+          secretName:kollus-com
+  rules:
+    - host: kollus-live-test.kollus.com
+      http:
+        paths: /
+          backend:
+            serviceName: kollus-live-svc
+            servicePort: 8443

@@ -240,9 +240,20 @@
                 controller.on('progress', function (percent, position, duration) {
                     $('#playtime').text(position);
                 });
+                controller.on('error', function (error){
+
+                    //에러 발생시 처리
+                    //error : 토큰 만료시 4085 발생
+                    if(error == 4085){
+                        //재처리 로직
+                    }
+                    alert(controller.get_error_detail());
+                });
+
             } catch (e) {
 
             }
+            window.controller = controller;
             return controller;
         }
 
@@ -266,7 +277,7 @@
             $.get(url, function (data) {
                 var res = JSON.parse(data);
                 var payload = res.payload;
-                var playUrl = res.url;
+                var playUrl = res.url + '&debug_mode=true';
                 if ($('#autoplay').is(':checked')) playUrl += '&a';
                 $('#jwt').val(JSON.stringify(payload, null, '\t'));
                 $('#url').val(playUrl);

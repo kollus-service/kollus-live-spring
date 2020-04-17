@@ -1,11 +1,21 @@
 ###
 ### spring devtool 설정
 spring:
+  profiles:
+    active: local
+---
+spring:
+  profiles: local
+  application:
+    name: kollus-live
   devtools:
     livereload:
       enabled: true
   thymeleaf:
+    suffix: .html
+    mode: HTML
     cache: false
+    enabled: true
 server:
   port: 8003
   ###
@@ -20,4 +30,27 @@ kollus:
   token: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjQ1OWUzNTMwYTk2OTQzZjI0NjI0MGViMWQwZmY0YTk2YzNhMjA3Y2MxMzcwZjg2YTViNDkyZTYyYjEzNDk1YzRiM2ZmYTEyN2I1MjFiOWY0In0.eyJhdWQiOiIzNyIsImp0aSI6IjQ1OWUzNTMwYTk2OTQzZjI0NjI0MGViMWQwZmY0YTk2YzNhMjA3Y2MxMzcwZjg2YTViNDkyZTYyYjEzNDk1YzRiM2ZmYTEyN2I1MjFiOWY0IiwiaWF0IjoxNTYzNDEwNDU5LCJuYmYiOjE1NjM0MTA0NTksImV4cCI6MTU5NTAzMjg1OSwic3ViIjoiNzA3NiIsInNjb3BlcyI6WyJsaXZlOmNvbnRyb2wiLCJsaXZlOnN0YXRpc3RpY3MiLCJsaXZlOmNyZWF0b3IiLCJjcmVhdG9yLWFwcC1hY3Rpb25zIl19.PF_Sw0EaAaOj00XnXi_stAlp1tM5pYKwHqFMMdMVv8nqGK8kbI5ldDYs2nPjV6il4uKxuP91JWU-ua59I2Cy3C8xdDwmM-oxWhhEtaE2V0fSWT2L54yNVPBMOkComxCLABdvC2xHoqArQf3k3GwK0KFFuGqXaikMhXQW6ZB1GuQu98U1jH4CyMVj9Vm-qZQXeR4g9EcgcBP1h6RmJP5Ff3cHhCZumkB4L4DzzX8EJ0DJRMBWQZucPS3UdPbxmCRfcidQGTfoHKRAWUjvtlGZIpCrVU1IquiuT-3K-XGZo4FKZBgrqF4GGcOJh-qWRVkBPo9cbjWqsF0pQjDMLur-b8NK2SksNWEj97sPVHhnegpoJMe6SxeyJWq8xUViUJn_53oq4CxDSOqZhNsNbAer67kVFm3Bi__mEaWVTrICivuPgAk1KA7ezGNxMuiZA4L6keliLU_tp7GT0_rJtgK5w1ybsEkbH1cWgnSDXHTg4SjHsDBmoHrrHH139JdDSwPNXTLi4XXVHoySH0HGLHBrRGWncNHGs0JtNAEKRQ8MJZKvZslg6O39zvmA3fyPx34w0X0HBATAgqXK2jlQUMxGufAKUzo17I94_t3_Tt_gyTpY9IgKCefE9XPlgMHVDwNNGyGLr1U7JzQ26UHr9GDNujQOTFTzH0CbGVCSyTW-pzo
   serviceAccount: hdyang2 #서비스계정아이디
   secretKey: hdyang2 #컨텐츠 재생을위한 비밀키
-  customKey: 595e1764905549df0bae72414bcaf67bf808ea3126d35a59b7ffbda7ed629560  #URL 검증을위한 키
+  customKey: 9d3269cf568e4b836ed7b3c1c5b66d690570e3942bc5c25ab92df993a4a3041c  #URL 검증을위한 키
+---
+spring:
+  profiles: KUBE
+  application:
+    name: kollus-live
+  thymeleaf:
+    suffix: .html
+    mode: HTML
+    cache: false
+    enabled: true
+server:
+  port: 8443
+kollus:
+  clientId: 55 #OAuth 토큰 획득을위한 사용자 아이디
+  clientSecret: ckaB0MsfLOOrs7jEJH0qoZ11pofsBevBD8FPbd7S #OAuth 토큰 획득을위한 사용자 비밀번호
+  scopes: #API 권한 범위 설정
+    - live:control
+    - live:statistics
+  # Personal Token
+  token: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjQ1OWUzNTMwYTk2OTQzZjI0NjI0MGViMWQwZmY0YTk2YzNhMjA3Y2MxMzcwZjg2YTViNDkyZTYyYjEzNDk1YzRiM2ZmYTEyN2I1MjFiOWY0In0.eyJhdWQiOiIzNyIsImp0aSI6IjQ1OWUzNTMwYTk2OTQzZjI0NjI0MGViMWQwZmY0YTk2YzNhMjA3Y2MxMzcwZjg2YTViNDkyZTYyYjEzNDk1YzRiM2ZmYTEyN2I1MjFiOWY0IiwiaWF0IjoxNTYzNDEwNDU5LCJuYmYiOjE1NjM0MTA0NTksImV4cCI6MTU5NTAzMjg1OSwic3ViIjoiNzA3NiIsInNjb3BlcyI6WyJsaXZlOmNvbnRyb2wiLCJsaXZlOnN0YXRpc3RpY3MiLCJsaXZlOmNyZWF0b3IiLCJjcmVhdG9yLWFwcC1hY3Rpb25zIl19.PF_Sw0EaAaOj00XnXi_stAlp1tM5pYKwHqFMMdMVv8nqGK8kbI5ldDYs2nPjV6il4uKxuP91JWU-ua59I2Cy3C8xdDwmM-oxWhhEtaE2V0fSWT2L54yNVPBMOkComxCLABdvC2xHoqArQf3k3GwK0KFFuGqXaikMhXQW6ZB1GuQu98U1jH4CyMVj9Vm-qZQXeR4g9EcgcBP1h6RmJP5Ff3cHhCZumkB4L4DzzX8EJ0DJRMBWQZucPS3UdPbxmCRfcidQGTfoHKRAWUjvtlGZIpCrVU1IquiuT-3K-XGZo4FKZBgrqF4GGcOJh-qWRVkBPo9cbjWqsF0pQjDMLur-b8NK2SksNWEj97sPVHhnegpoJMe6SxeyJWq8xUViUJn_53oq4CxDSOqZhNsNbAer67kVFm3Bi__mEaWVTrICivuPgAk1KA7ezGNxMuiZA4L6keliLU_tp7GT0_rJtgK5w1ybsEkbH1cWgnSDXHTg4SjHsDBmoHrrHH139JdDSwPNXTLi4XXVHoySH0HGLHBrRGWncNHGs0JtNAEKRQ8MJZKvZslg6O39zvmA3fyPx34w0X0HBATAgqXK2jlQUMxGufAKUzo17I94_t3_Tt_gyTpY9IgKCefE9XPlgMHVDwNNGyGLr1U7JzQ26UHr9GDNujQOTFTzH0CbGVCSyTW-pzo
+  serviceAccount: hdyang2 #서비스계정아이디
+  secretKey: hdyang2 #컨텐츠 재생을위한 비밀키
+  customKey: 9d3269cf568e4b836ed7b3c1c5b66d690570e3942bc5c25ab92df993a4a3041c  #URL 검증을위한 키

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kollus-live-backend
+  labels:
+    app: kollus-live
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kollus-live
+  template:
+    metadata:
+      labels:
+        app: kollus-live
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kollus-live
+                operator: In
+                values:
+                - "true"    
+      containers:
+        - name: kollus-live
+          image: svcreg.catenoid.net:5000/kollus-live:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8443
+

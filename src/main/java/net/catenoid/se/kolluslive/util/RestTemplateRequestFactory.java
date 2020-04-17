@@ -1,11 +1,9 @@
 package net.catenoid.se.kolluslive.util;
 
+import org.apache.catalina.util.ServerInfo;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.security.KeyManagementException;
@@ -15,13 +13,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class RestTemplateRequestFactory extends SimpleClientHttpRequestFactory {
+
     @Override
     protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
         if(connection instanceof HttpsURLConnection){
             ((HttpsURLConnection) connection).setHostnameVerifier((hostname, session) -> true);
             SSLContext sc;
             try {
-                sc = SSLContext.getInstance("SSL");
+                sc = SSLContext.getInstance("TLS");
                 sc.init(null, new TrustManager[]{new X509TrustManager() {
                     @Override
                     public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
